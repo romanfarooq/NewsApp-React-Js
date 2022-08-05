@@ -67,9 +67,11 @@ function News() {
   });
 
   return (
-    <div className="container my-3">
-      <h2>NewsMonkey - Top Headlines</h2>
-      <div className="d-flex justify-content-start flex-wrap">
+    <>
+      <h2 className="my-3" style={{ textAlign: "center" }}>
+        NewsMonkey - Top Headlines
+      </h2>
+      <div className="d-flex align-content-around flex-wrap">
         {info.articles.map((element) => {
           return (
             <NewsItem
@@ -81,7 +83,7 @@ function News() {
           );
         })}
       </div>
-    </div>
+    </>
   );
 }
 

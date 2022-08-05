@@ -1,10 +1,12 @@
 import React from "react";
 
 function NewsItem(props) {
+  
   const { title, description, imageUrl, key } = props;
 
   return (
-    <div className="card my-3" style={{ width: "18rem"}}>
+    <div style={{ margin: "0 4rem" }}>
+      <div className="card my-3" style={{ width: "18rem" }}>
         <img src={imageUrl} className="card-img-top" alt={title} />
         <div className="card-body">
           <h5 className="card-title">{title.slice(0, 74)}</h5>
@@ -14,6 +16,7 @@ function NewsItem(props) {
           </a>
         </div>
       </div>
+    </div>
   );
 }
 
