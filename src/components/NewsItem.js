@@ -1,7 +1,6 @@
 import React from "react";
 
 function NewsItem(props) {
-  
   const { title, description, imageUrl, newsUrl } = props;
 
   return (
@@ -10,8 +9,13 @@ function NewsItem(props) {
         <img src={imageUrl} className="card-img-top" alt={title} />
         <div className="card-body">
           <h5 className="card-title">{title}</h5>
-          <p className="card-text">{description.slice(0, 105)}</p>
-          <a href={newsUrl} target="_blank" className="btn btn-sm btn-primary">
+          <p className="card-text">{description}</p>
+          <a
+            href={newsUrl}
+            rel="noreferrer"
+            target="_blank"
+            className="btn btn-sm btn-dark"
+          >
             Read More...
           </a>
         </div>

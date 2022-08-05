@@ -2,24 +2,32 @@ import React, { useState, useEffect } from "react";
 import NewsItem from "./NewsItem";
 
 function News() {
-  
   const [article, setArticle] = useState([]);
-  // const [loading, setLoading] = useState(true);use
-  // const [page, setPage] = useState(1);
-  // const [totalResults, setTotalResults] = useState(0);
+  // const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
 
   const updateNews = async () => {
-    const url =
-      "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c";
+    const url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=18&page=${page}`;
     const data = await fetch(url);
     const parsedData = await data.json();
-    console.log(parsedData);
     setArticle(parsedData.articles);
+    setTotalResults(parsedData.totalResults);
   };
 
   useEffect(() => {
     updateNews();
-  }, []);
+  });
+
+  const handlePrevious = async () => {
+      setPage(page - 1);
+      updateNews();
+  };
+
+  const handleNext = async () => {
+    setPage(page + 1);
+    updateNews();
+  };
 
   return (
     <>
@@ -42,6 +50,27 @@ function News() {
             />
           );
         })}
+      </div>
+      <div
+        className="d-flex justify-content-between"
+        style={{ margin: "2rem 4rem" }}
+      >
+        <button
+          type="button"
+          className="btn btn-dark"
+          disabled={page <= 1}
+          onClick={handlePrevious}
+        >
+          &larr; Previous
+        </button>
+        <button
+          type="button"
+          className="btn btn-dark px-4"
+          disabled={page >= Math.ceil(totalResults / 18)}
+          onClick={handleNext}
+        >
+          Next &rarr;
+        </button>
       </div>
     </>
   );
