@@ -9,18 +9,23 @@ function News(props) {
   const [totalResults, setTotalResults] = useState(0);
 
   useEffect(() => {
-    setLoading(true);
-    fetch(
-      `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`
-    )
-      .then((response) => response.json())
-      .then((data) => setArticle(data.articles))
-      .then((data) => setTotalResults(data.totalResults))
-      .catch((err) => {
+    const updateNews = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`
+        );
+        let actualData = await response.json();
+        setArticle(actualData.articles);
+        setTotalResults(actualData.totalResults);
+      } catch (err) {
         console.log(err);
-      });
-    setLoading(false);
-  }, [page]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    updateNews();
+  }, [page, props.pageSize]);
 
   const handlePrevious = () => {
     setPage(page - 1);
@@ -59,7 +64,7 @@ function News(props) {
         <button
           type="button"
           className="btn btn-dark"
-          disabled={page <= 1}
+          disabled={page === 1}
           onClick={handlePrevious}
         >
           &larr; Previous
@@ -67,7 +72,7 @@ function News(props) {
         <button
           type="button"
           className="btn btn-dark px-4"
-          disabled={page + 1 > Math.ceil(totalResults / props.pageSize)}
+          disabled={page === Math.ceil(totalResults / props.pageSize)}
           onClick={handleNext}
         >
           Next &rarr;
