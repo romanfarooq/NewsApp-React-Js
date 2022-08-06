@@ -7,7 +7,7 @@ function News() {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const updateNews = async () => {
@@ -24,6 +24,7 @@ function News() {
         let actualData = await response.json();
         setArticle(actualData.articles);
         setTotalResults(actualData.totalResults);
+        setError(null);
       } catch (err) {
         setError(err.message);
         setArticle([]);
@@ -48,7 +49,7 @@ function News() {
       <h2 className="my-3 text-center">NewsMonkey - Top Headlines</h2>
       {loading && <Spinner />}
       <div className="d-flex align-content-around flex-wrap">
-        {!loading && error.length !== 0 ? (
+        {!loading && error ? (
           <h2 style={{ margin: "10rem auto" }}>{error}</h2>
         ) : (
           !loading && article.map((element) => {
