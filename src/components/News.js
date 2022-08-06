@@ -1,41 +1,60 @@
 import React, { useState, useEffect } from "react";
 import NewsItem from "./NewsItem";
+import Spinner from "./Spinner";
 
-function News() {
+function News(props) {
   const [article, setArticle] = useState([]);
-  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
 
-  const updateNews = async () => {
-    const url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=18&page=${page}`;
+  // const updateNews = async () => {
+  //   const url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`;
+  //   const data = await fetch(url);
+  //   const parsedData = await data.json();
+  //   setArticle(parsedData.articles);
+  //   //setTotalResults(parsedData.totalResults);
+  // };
+
+  useEffect(() => {
+    const seteNews = async () => {
+      const url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`;
+      setLoading(true);
+      const data = await fetch(url);
+      const parsedData = await data.json();
+      setArticle(parsedData.articles);
+      setTotalResults(parsedData.totalResults);
+      setLoading(false);
+    };
+    seteNews();
+  }, []);
+
+  const handlePrevious = async () => {
+    setPage(page - 1);
+    const url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page - 1}`;
+    setLoading(true);
     const data = await fetch(url);
     const parsedData = await data.json();
     setArticle(parsedData.articles);
-    setTotalResults(parsedData.totalResults);
-  };
-
-  useEffect(() => {
-    updateNews();
-  });
-
-  const handlePrevious = async () => {
-      setPage(page - 1);
-      updateNews();
+    setLoading(false);
   };
 
   const handleNext = async () => {
     setPage(page + 1);
-    updateNews();
+    const url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page + 1}`;
+    setLoading(true);
+    const data = await fetch(url);
+    const parsedData = await data.json();
+    setArticle(parsedData.articles);
+    setLoading(false);
   };
 
   return (
     <>
-      <h2 className="my-3" style={{ textAlign: "center" }}>
-        NewsMonkey - Top Headlines
-      </h2>
+      <h2 className="my-3 text-center">NewsMonkey - Top Headlines</h2>
+      {loading && <Spinner />}
       <div className="d-flex align-content-around flex-wrap">
-        {article.map((element) => {
+        {!loading && article.map((element) => {
           return (
             <NewsItem
               key={element.url}
@@ -58,7 +77,7 @@ function News() {
         <button
           type="button"
           className="btn btn-dark"
-          disabled={page <= 1}
+          disabled={page === 1}
           onClick={handlePrevious}
         >
           &larr; Previous
@@ -66,7 +85,7 @@ function News() {
         <button
           type="button"
           className="btn btn-dark px-4"
-          disabled={page >= Math.ceil(totalResults / 18)}
+          disabled={page === Math.ceil(totalResults / props.pageSize)}
           onClick={handleNext}
         >
           Next &rarr;
