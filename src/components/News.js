@@ -15,6 +15,11 @@ function News(props) {
         const response = await fetch(
           `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`
         );
+        if (!response.ok) {
+          throw new Error(
+            `This is an HTTP error: The status is ${response.status}`
+          );
+        }
         let actualData = await response.json();
         setArticle(actualData.articles);
         setTotalResults(actualData.totalResults);
@@ -25,7 +30,8 @@ function News(props) {
       }
     };
     updateNews();
-  }, [page, props.pageSize]);
+    // eslint-disable-next-line
+  }, [page]);
 
   const handlePrevious = () => {
     setPage(page - 1);
@@ -40,8 +46,7 @@ function News(props) {
       <h2 className="my-3 text-center">NewsMonkey - Top Headlines</h2>
       {loading && <Spinner />}
       <div className="d-flex align-content-around flex-wrap">
-        {!loading &&
-          article.map((element) => {
+        {!loading && article.map((element) => {
             return (
               <NewsItem
                 key={element.url}
