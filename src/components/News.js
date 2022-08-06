@@ -2,18 +2,19 @@ import React, { useState, useEffect } from "react";
 import NewsItem from "./NewsItem";
 import Spinner from "./Spinner";
 
-function News(props) {
+function News() {
   const [article, setArticle] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const updateNews = async () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`
+          `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=18&page=${page}`
         );
         if (!response.ok) {
           throw new Error(
@@ -24,13 +25,14 @@ function News(props) {
         setArticle(actualData.articles);
         setTotalResults(actualData.totalResults);
       } catch (err) {
-        console.log(err);
+        setError(err.message);
+        setArticle([]);
+        setTotalResults(0);
       } finally {
         setLoading(false);
       }
     };
     updateNews();
-    // eslint-disable-next-line
   }, [page]);
 
   const handlePrevious = () => {
@@ -46,7 +48,10 @@ function News(props) {
       <h2 className="my-3 text-center">NewsMonkey - Top Headlines</h2>
       {loading && <Spinner />}
       <div className="d-flex align-content-around flex-wrap">
-        {!loading && article.map((element) => {
+        {!loading && error.length !== 0 ? (
+          <h2 style={{ margin: "10rem auto" }}>{error}</h2>
+        ) : (
+          !loading && article.map((element) => {
             return (
               <NewsItem
                 key={element.url}
@@ -60,29 +65,36 @@ function News(props) {
                 newsUrl={element.url}
               />
             );
-          })}
+          })
+        )}
       </div>
-      <div
-        className="d-flex justify-content-between"
-        style={{ margin: "2rem 4rem" }}
-      >
-        <button
-          type="button"
-          className="btn btn-dark"
-          disabled={page === 1}
-          onClick={handlePrevious}
+      {!loading && (
+        <div
+          className="d-flex justify-content-between"
+          style={{ margin: "2rem 4rem" }}
         >
-          &larr; Previous
-        </button>
-        <button
-          type="button"
-          className="btn btn-dark px-4"
-          disabled={page === Math.ceil(totalResults / props.pageSize)}
-          onClick={handleNext}
-        >
-          Next &rarr;
-        </button>
-      </div>
+          <button
+            type="button"
+            className="btn btn-dark"
+            disabled={page === 1}
+            onClick={handlePrevious}
+          >
+            &larr; Previous
+          </button>
+          <button
+            type="button"
+            className="btn btn-dark px-4"
+            disabled={
+              totalResults === 0
+                ? true
+                : page + 1 === Math.ceil(totalResults / 18)
+            }
+            onClick={handleNext}
+          >
+            Next &rarr;
+          </button>
+        </div>
+      )}
     </>
   );
 }
