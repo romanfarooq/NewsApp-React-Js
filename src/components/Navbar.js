@@ -27,7 +27,37 @@ function Navbar() {
             </li>
             <li className="nav-item">
               <a className="nav-link" href="/#">
-                Link
+                About
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/#">
+                Business
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/#">
+                Entertainment
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/#">
+                Health
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/#">
+                Science
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/#">
+                Sports
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/#">
+                technology
               </a>
             </li>
           </ul>

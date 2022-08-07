@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import NewsItem from "./NewsItem";
 import Spinner from "./Spinner";
 
-function News() {
+function News(props) {
   const [article, setArticle] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -14,7 +15,7 @@ function News() {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=18&page=${page}`
+          `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`
         );
         if (!response.ok) {
           throw new Error(
@@ -34,7 +35,7 @@ function News() {
       }
     };
     updateNews();
-  }, [page]);
+  }, [page, props.country, props.category, props.pageSize]);
 
   const handlePrevious = () => {
     setPage(page - 1);
@@ -88,7 +89,7 @@ function News() {
             disabled={
               totalResults === 0
                 ? true
-                : page + 1 === Math.ceil(totalResults / 18)
+                : page + 1 === Math.ceil(totalResults / props.pageSize)
             }
             onClick={handleNext}
           >
@@ -99,5 +100,17 @@ function News() {
     </>
   );
 }
+
+News.defaultProps = {
+  country: "us",
+  category: "general",
+  pageSize: 18
+};
+
+News.propTypes = {
+  country: PropTypes.string.isRequired,
+  category: PropTypes.string.isRequired,
+  pageSize: PropTypes.number.isRequired
+};
 
 export default News;
