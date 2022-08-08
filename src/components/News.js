@@ -13,6 +13,7 @@ function News(props) {
   useEffect(() => {
     const updateNews = async () => {
       try {
+        document.title = `NewsMonkey - ${capitalize(props.category)}`;
         setLoading(true);
         const response = await fetch(
           `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`
@@ -37,6 +38,10 @@ function News(props) {
     updateNews();
   }, [page, props.country, props.category, props.pageSize]);
 
+  const capitalize = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   const handlePrevious = async () => {
     setPage(page - 1);
   };
@@ -48,7 +53,7 @@ function News(props) {
   return (
     <>
       <div className="container my-3">
-        <h2 className="text-center my-3">NewsMonkey - Top Headlines</h2>
+        <h2 className="text-center my-3">NewsMonkey - Top {capitalize(props.category)} Headlines</h2>
         {loading && <Spinner />}
         <div className="row">
           {!loading && error ? (
