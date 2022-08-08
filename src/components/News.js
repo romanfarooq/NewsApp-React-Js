@@ -37,11 +37,11 @@ function News(props) {
     updateNews();
   }, [page, props.country, props.category, props.pageSize]);
 
-  const handlePrevious = () => {
+  const handlePrevious = async () => {
     setPage(page - 1);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setPage(page + 1);
   };
 
