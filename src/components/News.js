@@ -47,56 +47,59 @@ function News(props) {
 
   return (
     <>
-      <h2 className="my-3 text-center">NewsMonkey - Top Headlines</h2>
-      {loading && <Spinner />}
-      <div className="d-flex align-content-around flex-wrap">
-        {!loading && error ? (
-          <h2 style={{ margin: "10rem auto" }}>{error}</h2>
-        ) : (
-          !loading && article.map((element) => {
-            return (
-              <NewsItem
-                key={element.url}
-                title={element.title ? element.title : ""}
-                description={element.description ? element.description : ""}
-                imageUrl={
-                  element.urlToImage
-                    ? element.urlToImage
-                    : "https://image.cnbcfm.com/api/v1/image/107000211-1642009706804-gettyimages-1011792700-mon1158118.jpeg?v=1642009864&w=1920&h=1080"
-                }
-                newsUrl={element.url}
-              />
-            );
-          })
+      <div className="container my-3">
+        <h2 className="text-center my-3">NewsMonkey - Top Headlines</h2>
+        {loading && <Spinner />}
+        <div className="row">
+          {!loading && error ? (
+            <h2 className="text-center my-5">{error}</h2>
+          ) : (
+            !loading && article.map((element) => {
+              return (
+                <div className="col-md-4" key={element.url}>
+                  <NewsItem
+                    title={element.title ? element.title : ""}
+                    description={element.description ? element.description : ""}
+                    imageUrl={
+                      element.urlToImage
+                        ? element.urlToImage
+                        : "https://image.cnbcfm.com/api/v1/image/107000211-1642009706804-gettyimages-1011792700-mon1158118.jpeg?v=1642009864&w=1920&h=1080"
+                    }
+                    newsUrl={element.url}
+                    author={element.author ? element.author : "Unknown"}
+                    date={new Date(element.publishedAt).toGMTString()}
+                    source={element.source.name}
+                  />
+                </div>
+              );
+            })
+          )}
+        </div>
+        {!loading && (
+          <div className="d-flex justify-content-between">
+            <button
+              type="button"
+              className="btn btn-dark"
+              disabled={page === 1}
+              onClick={handlePrevious}
+            >
+              &larr; Previous
+            </button>
+            <button
+              type="button"
+              className="btn btn-dark px-4"
+              disabled={
+                totalResults === 0
+                  ? true
+                  : page === Math.ceil(totalResults / props.pageSize)
+              }
+              onClick={handleNext}
+            >
+              Next &rarr;
+            </button>
+          </div>
         )}
       </div>
-      {!loading && (
-        <div
-          className="d-flex justify-content-between"
-          style={{ margin: "2rem 4rem" }}
-        >
-          <button
-            type="button"
-            className="btn btn-dark"
-            disabled={page === 1}
-            onClick={handlePrevious}
-          >
-            &larr; Previous
-          </button>
-          <button
-            type="button"
-            className="btn btn-dark px-4"
-            disabled={
-              totalResults === 0
-                ? true
-                : page + 1 === Math.ceil(totalResults / props.pageSize)
-            }
-            onClick={handleNext}
-          >
-            Next &rarr;
-          </button>
-        </div>
-      )}
     </>
   );
 }
@@ -104,13 +107,13 @@ function News(props) {
 News.defaultProps = {
   country: "us",
   category: "general",
-  pageSize: 18
+  pageSize: 18,
 };
 
 News.propTypes = {
   country: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
-  pageSize: PropTypes.number.isRequired
+  pageSize: PropTypes.number.isRequired,
 };
 
 export default News;
