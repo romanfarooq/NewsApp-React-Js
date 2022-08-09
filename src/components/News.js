@@ -11,12 +11,52 @@ function News(props) {
   const [totalResults, setTotalResults] = useState(0);
   const [error, setError] = useState(null);
 
-  const updateNews = async () => {
+  useEffect(() => {
+    const abortController = new AbortController();
+    const updateNews = async () => {
+      try {
+        document.title = `NewsMonkey - ${capitalize(props.category)}`;
+        const response = await fetch(
+          `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`,
+          { signal: abortController.signal }
+        );
+        if (!response.ok) {
+          throw new Error(
+            `This is an HTTP error: The status is ${response.status}`
+          );
+        }
+        let actualData = await response.json();
+        setArticle(actualData.articles);
+        setTotalResults(actualData.totalResults);
+        setError(null);
+        setPage(1);
+      } catch (err) {
+        if (!abortController.signal.aborted) {
+          setError(err.message);
+          setArticle([]);
+          setTotalResults(0);
+          setPage(1);
+        }
+      }
+    };
+    updateNews();
+    return () => {
+      abortController.abort();
+    };
+    // eslint-disable-next-line
+  }, [props.category]);
+
+  const capitalize = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  const fetchMoreData = async () => {
+    // setPage(page + 1);
+    console.log(page);
     try {
-      document.title = `NewsMonkey - ${capitalize(props.category)}`;
-      // setLoading(true);
+      // document.title = `NewsMonkey - ${capitalize(props.category)}`;
       const response = await fetch(
-        `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`
+        `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page + 1}`
       );
       if (!response.ok) {
         throw new Error(
@@ -24,39 +64,17 @@ function News(props) {
         );
       }
       let actualData = await response.json();
-      console.log(article);
       setArticle(article.concat(actualData.articles));
-      setTotalResults(actualData.totalResults);
+      // setTotalResults(actualData.totalResults);
       setError(null);
+      setPage(page + 1);
     } catch (err) {
       setError(err.message);
       setArticle([]);
       setTotalResults(0);
-    } finally {
-      // setLoading(false);
+      setPage(1);
     }
-  };
-
-  useEffect(() => {
-    setArticle([]);
-    updateNews();
-    // eslint-disable-next-line
-  }, []);
-
-  const capitalize = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-
-  const fetchMoreData = async () => {
-    // a fake async api call like which sends
-    // 20 more records in 1.5 secs
-    setPage(page + 1);
-    updateNews();
-    // setTimeout(() => {
-    //   this.setState({
-    //     items: this.state.items.concat(Array.from({ length: 20 }))
-    //   });
-    // }, 1500);
+    console.log(page);
   };
 
   // const handlePrevious = async () => {
@@ -138,14 +156,16 @@ function News(props) {
 
 News.defaultProps = {
   country: "us",
-  category: "general",
+  // category: "general",
   pageSize: 18,
+  page: 1,
 };
 
 News.propTypes = {
   country: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
   pageSize: PropTypes.number.isRequired,
+  page: PropTypes.number.isRequired,
 };
 
 export default News;
