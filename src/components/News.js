@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import PropTypes from "prop-types";
 import NewsItem from "./NewsItem";
@@ -6,15 +6,20 @@ import Spinner from "./Spinner";
 
 function News(props) {
   const [article, setArticle] = useState([]);
-  // const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [error, setError] = useState(null);
+  const prevCategory = useRef(props.category);
 
   useEffect(() => {
     const abortController = new AbortController();
     const updateNews = async () => {
       try {
+        if (prevCategory.current !== props.category) {
+          setArticle([]);
+          setPage(1);
+          setTotalResults(0);
+        }
         document.title = `NewsMonkey - ${capitalize(props.category)}`;
         const response = await fetch(
           `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page}`,
@@ -26,10 +31,9 @@ function News(props) {
           );
         }
         let actualData = await response.json();
-        setArticle(actualData.articles);
+        setArticle([...article, ...actualData.articles]);
         setTotalResults(actualData.totalResults);
         setError(null);
-        setPage(1);
       } catch (err) {
         if (!abortController.signal.aborted) {
           setError(err.message);
@@ -37,6 +41,8 @@ function News(props) {
           setTotalResults(0);
           setPage(1);
         }
+      } finally {
+        prevCategory.current = props.category;
       }
     };
     updateNews();
@@ -44,46 +50,15 @@ function News(props) {
       abortController.abort();
     };
     // eslint-disable-next-line
-  }, [props.category]);
+  }, [props.category, page]);
 
   const capitalize = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
-  const fetchMoreData = async () => {
-    // setPage(page + 1);
-    console.log(page);
-    try {
-      // document.title = `NewsMonkey - ${capitalize(props.category)}`;
-      const response = await fetch(
-        `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=${props.pageSize}&page=${page + 1}`
-      );
-      if (!response.ok) {
-        throw new Error(
-          `This is an HTTP error: The status is ${response.status}`
-        );
-      }
-      let actualData = await response.json();
-      setArticle(article.concat(actualData.articles));
-      // setTotalResults(actualData.totalResults);
-      setError(null);
-      setPage(page + 1);
-    } catch (err) {
-      setError(err.message);
-      setArticle([]);
-      setTotalResults(0);
-      setPage(1);
-    }
-    console.log(page);
+  const fetchMoreData = () => {
+    setPage(page + 1);
   };
-
-  // const handlePrevious = async () => {
-  //   setPage(page - 1);
-  // };
-
-  // const handleNext = async () => {
-  //   setPage(page + 1);
-  // };
 
   return (
     <>
@@ -126,37 +101,13 @@ function News(props) {
           </div>
         </div>
       </InfiniteScroll>
-      {/* {!loading && (
-          <div className="d-flex justify-content-between">
-            <button
-              type="button"
-              className="btn btn-dark"
-              disabled={page === 1}
-              onClick={handlePrevious}
-            >
-              &larr; Previous
-            </button>
-            <button
-              type="button"
-              className="btn btn-dark px-4"
-              disabled={
-                totalResults === 0
-                  ? true
-                  : page === Math.ceil(totalResults / props.pageSize)
-              }
-              onClick={handleNext}
-            >
-              Next &rarr;
-            </button>
-          </div>
-        )} */}
     </>
   );
 }
 
 News.defaultProps = {
   country: "us",
-  // category: "general",
+  category: "general",
   pageSize: 18,
   page: 1,
 };
