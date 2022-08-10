@@ -10,13 +10,18 @@ function News(props) {
   const [totalResults, setTotalResults] = useState(0);
   const [error, setError] = useState(null);
 
+  const capitalize = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  document.title = `${capitalize(props.category)} - NewsApp`;
+
   useEffect(() => {
     const abortController = new AbortController();
     const updateNews = async () => {
       try {
-        document.title = `NewsMonkey - ${capitalize(props.category)}`;
         const response = await fetch(
-          `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=fd9d876538e0440986ae848fcfcbc24c&pageSize=18&page=${page}`,
+          `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&pageSize=${props.pageSize}&page=${page}`,
           { signal: abortController.signal }
         );
         if (!response.ok) {
@@ -41,12 +46,8 @@ function News(props) {
     return () => {
       abortController.abort();
     };
-    //eslint-disable-next-line 
+    //eslint-disable-next-line
   }, [page]);
-
-  const capitalize = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
 
   const fetchMoreData = () => {
     setPage(page + 1);
@@ -54,8 +55,8 @@ function News(props) {
 
   return (
     <>
-      <h2 className="text-center my-3">
-        NewsMonkey - Top {capitalize(props.category)} Headlines
+      <h2 className="text-center" style={{ margin: "5rem" }}>
+        NewsApp - Top {capitalize(props.category)} Headlines
       </h2>
       <InfiniteScroll
         dataLength={article.length}
@@ -66,7 +67,9 @@ function News(props) {
         <div className="container">
           <div className="row">
             {error ? (
-              <h2 className="text-center my-5">{error}</h2>
+              <h2 className="text-center" style={{ marginTop: "8rem" }}>
+                {error}
+              </h2>
             ) : (
               article.map((element) => {
                 return (
@@ -98,11 +101,13 @@ function News(props) {
 }
 
 News.defaultProps = {
+  country: "us",
   category: "general",
+  pageSize: 18,
 };
 
 News.propTypes = {
-  category: PropTypes.string.isRequired,
+  apiKey: PropTypes.string,
 };
 
 export default News;
