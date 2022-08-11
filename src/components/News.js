@@ -55,7 +55,7 @@ function News(props) {
 
   return (
     <>
-      <h2 className="text-center" style={{ margin: "5rem" }}>
+      <h2 className="text-center" style={{ margin: "5rem 0 1rem 0" }}>
         NewsApp - Top {capitalize(props.category)} Headlines
       </h2>
       <InfiniteScroll
@@ -67,7 +67,7 @@ function News(props) {
         <div className="container">
           <div className="row">
             {error ? (
-              <h2 className="text-center" style={{ marginTop: "8rem" }}>
+              <h2 className="text-center" style={{ marginTop: "12rem" }}>
                 {error}
               </h2>
             ) : (
